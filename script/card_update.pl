@@ -24,6 +24,7 @@ use JSON;
 use LWP::Simple;
 use File::Slurp;
 use Image::Magick;
+use Encode;
 
 # Load the existing card database
 my $cardsfile = 'app/data/cards.json';
@@ -43,13 +44,13 @@ for (keys %Cur_Cards) {
 my $nrdb_export = get ("http://netrunnerdb.com/api/cards/");
 
 # Remove unicode characters from the export
-#$nrdb_export =~ s/(\\u\d\d\d\d)/decode("UTF-16", $1)/ge;
+#$nrdb_export =~ s/(\\u\d\d\d\d)//g;
 
 # These attrs from NRDB are irrelevant 
 my @removed_attrs = qw/code set_code side_code faction_code cyclenumber limited faction_letter type_code subtype_code last-modified/;
 
 my $dataset;
-my $cards_dataset = decode_json $nrdb_export;
+my $cards_dataset = JSON::XS->new->decode(decode "UTF-8", $nrdb_export);
 my $AltsList;
 my $NoAltsList;
 
