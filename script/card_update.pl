@@ -43,7 +43,7 @@ for (keys %Cur_Cards) {
 my $nrdb_export = get ("http://netrunnerdb.com/api/cards/");
 
 # Remove unicode characters from the export
-$nrdb_export =~ s/\\u\d\d\d\d//g;
+#$nrdb_export =~ s/(\\u\d\d\d\d)/decode("UTF-16", $1)/ge;
 
 # These attrs from NRDB are irrelevant 
 my @removed_attrs = qw/code set_code side_code faction_code cyclenumber limited faction_letter type_code subtype_code last-modified/;
@@ -91,18 +91,18 @@ for (keys %Cur_Cards) {
 for (keys %Imp_Cards){
 
 	#Download Images
-	my $image = Image::Magick->new(magick=>'png');
-	$image->BlobToImage(get ("http://netrunnerdb.com/" . $Imp_Cards{$_}->{nrdb_art}));
-	print "Downloading and converting " . $Imp_Cards{$_}->{imagesrc} ." From " . $Imp_Cards{$_}->{nrdb_art} . "\n";
+	#my $image = Image::Magick->new(magick=>'png');
+	#$image->BlobToImage(get ("http://netrunnerdb.com/" . $Imp_Cards{$_}->{nrdb_art}));
+	#print "Downloading and converting " . $Imp_Cards{$_}->{imagesrc} ." From " . $Imp_Cards{$_}->{nrdb_art} . "\n";
 	#Convert Images to the correct format
-	$image->Quantize(colors=>256, colorspace=>'RGB', dither=>1);
-	my $err = $image->Write("app" . $Imp_Cards{$_}->{imagesrc});
-	warn "$err" if $err;
+	#$image->Quantize(colors=>256, colorspace=>'RGB', dither=>1);
+	#my $err = $image->Write("app" . $Imp_Cards{$_}->{imagesrc});
+	#warn "$err" if $err;
 
 	delete $Imp_Cards{$_}->{nrdb_art};
 
 	#Add Breaker Calc info
-	if ($Imp_Cards{$_}->{subtype} =~ m/Icebreaker/) {
+	if (defined($Imp_Cards{$_}->{subtype}) && $Imp_Cards{$_}->{subtype} =~ m/Icebreaker/) {
 		$Imp_Cards{$_}->{text} =~ m/(\d).*(\d*).*subroutine.*(\d*).*(\d*)/;
 		my $br_credits;
 		my $br_subs;
@@ -172,7 +172,7 @@ for my $set (@$sets_dataset) {
 	push @$sets_proper, $set;
 }
 
-@$sets_proper = sort {$a->{released} cmp $b->{released}} @$sets_proper;
+#@$sets_proper = sort {$a->{released} cmp $b->{released}} @$sets_proper;
 
 # Update the Datestamp
 $dataset->{"last-modified"} = modifiedDate();
